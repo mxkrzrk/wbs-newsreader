@@ -1,0 +1,2 @@
+# wbs-newsreader
+HackerNews copy
