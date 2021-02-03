@@ -3,11 +3,13 @@ import './App.css';
 import Container from './components/Container/Container';
 import Main from './components/Main/Main';
 import Card from './components/Card/Card';
+import Header from './components/Header/Header'; 
+import Footer from './components/Footer/Footer';
 
 function App() {
   return (
     <Container>
-      <div>Header</div>
+      <Header />
       <div>SearchBar</div>
       <Main>
         <div>Card</div>
@@ -26,7 +28,7 @@ function App() {
         url= "https://www.freecodecamp.org/news/python-vs-javascript-what-are-the-key-differences-between-the-two-popular-programming-languages/" 
         />
       </Main>
-      <div>Footer</div>
+      <Footer/>
     </Container>
   );
 }
