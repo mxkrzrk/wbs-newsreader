@@ -2,7 +2,7 @@ import React from "react";
 
 const Header= () => {
     return(
-    <header>
+    //<header>
         <nav className="navbar navbar-expand-lg navbar-light" style={{backgroundColor: "#Bfcca1"}}>
             <a className="navbar-brand" href="#">NewsReader</a>
             <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,7 +16,7 @@ const Header= () => {
                 </div>
             </div>    
         </nav>
-    </header>
+    //</header>
 
     )
 } 
