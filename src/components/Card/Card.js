@@ -1,24 +1,21 @@
-import React from "react"
-import Container from "../Container/Container"
+import React from 'react';
+import Container from '../Container/Container';
 
-function Card({title,author,points,objectID,url}){
-    return(
-        <Container class="row" id={objectID}>
-            <div class="col-12">
-                <h6 href={url}>{title}</h6>
-                <div class="row justify-content-left">
-                    <p class="col-auto">by:{author}</p>
-                    <p class="col-auto" >points:{points}</p>
-                </div>
-            </div>
-         
-        </Container>
-    )
+function Card({ title, author, points, objectID, url }) {
+  return (
+    <Container className="row" id={objectID}>
+      <div className="col-12">
+        <h6 href={url}>{title}</h6>
+        <div className="row justify-content-left">
+          <p className="col-auto">by:{author}</p>
+          <p className="col-auto">points:{points}</p>
+        </div>
+      </div>
+    </Container>
+  );
 }
 
-export default Card
-
-
+export default Card;
 
 // "title": "Python vs. JavaScript – What Are the Key Differences?"
 // "author": "oedmarap"
