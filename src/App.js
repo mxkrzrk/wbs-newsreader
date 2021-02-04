@@ -1,34 +1,80 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import Container from './components/Container/Container';
 import Main from './components/Main/Main';
 import Card from './components/Card/Card';
-import Header from './components/Header/Header'; 
+import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 
 function App() {
+  const [news, setNews] = useState();
+  const [userInput, setUserInput] = useState();
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    fetch('https://hn.algolia.com/api/v1/search?tags=front_page')
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error('Error');
+        }
+      })
+      .then((data) => setNews(data.hits))
+      .catch((err) => console.error(err));
+  }, []);
+
+  const handleInputUser = (e) => {
+    setUserInput(e.target.value);
+  };
+
+  const handleSubmitUser = (e) => {
+    e.preventDefault();
+    // Check if input is not empty
+    if (!userInput) return;
+    // Retrieve data
+    fetch(`https://hn.algolia.com/api/v1/search?query=${userInput}`)
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error('Error');
+        }
+      })
+      .then((data) => {
+        if (data.hits.length === 0) {
+          setNews(null);
+          setError(true);
+        } else {
+          setNews(data.hits);
+          setError(false);
+        }
+      })
+      .catch((err) => console.error(err));
+  };
+
   return (
     <Container>
       <Header />
-      <div>SearchBar</div>
+      <form onSubmit={handleSubmitUser}>
+        <input type="text" placeholder="Search" onChange={handleInputUser} />
+        <button type="submit">Search</button>
+      </form>
       <Main>
         <div>Card</div>
-        <Card
-        title= "Python vs. JavaScript – What Are the Key Differences?"
-         author= "oedmarap"
-        points= "1"
-        objectID= "25977892"
-        url= "https://www.freecodecamp.org/news/python-vs-javascript-what-are-the-key-differences-between-the-two-popular-programming-languages/" 
-        />
-        <Card
-        title= "Python vs. JavaScript – What Are the Key Differences?"
-         author= "oedmarap"
-        points= "1"
-        objectID= "25977892"
-        url= "https://www.freecodecamp.org/news/python-vs-javascript-what-are-the-key-differences-between-the-two-popular-programming-languages/" 
-        />
+        {error && <div>Error</div>}
+        {news &&
+          news.map((article) => (
+            <Card
+              key={article.objectID}
+              title={article.title}
+              author={article.author}
+              points={article.points}
+              url={article.url.value}
+            />
+          ))}
       </Main>
-      <Footer/>
+      <Footer />
     </Container>
   );
 }
