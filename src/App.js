@@ -5,6 +5,7 @@ import Main from './components/Main/Main';
 import Card from './components/Card/Card';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
+import SearchBar from './components/Search';
 
 function App() {
   const [news, setNews] = useState();
@@ -56,10 +57,11 @@ function App() {
   return (
     <Container>
       <Header />
-      <form onSubmit={handleSubmitUser}>
-        <input type="text" placeholder="Search" onChange={handleInputUser} />
-        <button type="submit">Search</button>
-      </form>
+      <Search />
+//       <form onSubmit={handleSubmitUser}>
+//         <input type="text" placeholder="Search" onChange={handleInputUser} />
+//         <button type="submit">Search</button>
+//       </form>
       <Main>
         <div>Card</div>
         {error && <div>Error</div>}
