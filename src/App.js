@@ -1,27 +1,37 @@
 import React, { useEffect, useState } from 'react';
+import { fetchNews } from './api';
 import './App.css';
 import Container from './components/Container/Container';
 import Main from './components/Main/Main';
 import Card from './components/Card/Card';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
+// import Search from './components/Search/search';
 
 function App() {
   const [news, setNews] = useState();
   const [userInput, setUserInput] = useState();
-  const [error, setError] = useState(false);
+  const [error, setError] = useState({ isError: false });
 
   useEffect(() => {
-    fetch('https://hn.algolia.com/api/v1/search?tags=front_page')
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          throw new Error('Error');
-        }
+    // Get news from API
+    fetchNews('https://hn.algolia.com/api/v1/search?tags=front_page')
+      .then((data) => {
+        setError({ isError: false, message: '' });
+        setNews(data);
       })
-      .then((data) => setNews(data.hits))
-      .catch((err) => console.error(err));
+      .catch((err) => setError({ isError: true, message: err.message }));
+    // Refresh news every 5 minutes
+    const intervalID = setInterval(() => {
+      fetchNews('https://hn.algolia.com/api/v1/search?tags=front_page')
+        .then((data) => {
+          setError({ isError: false, message: '' });
+          setNews(data);
+        })
+        .catch((err) => setError({ isError: true, message: err.message }));
+    }, 300000);
+    // Clear interval
+    return () => clearInterval(intervalID);
   }, []);
 
   const handleInputUser = (e) => {
@@ -33,46 +43,33 @@ function App() {
     // Check if input is not empty
     if (!userInput) return;
     // Retrieve data
-    fetch(`https://hn.algolia.com/api/v1/search?query=${userInput}`)
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          throw new Error('Error');
-        }
-      })
+    fetchNews(`https://hn.algolia.com/api/v1/search?query=${userInput}`)
       .then((data) => {
-        if (data.hits.length === 0) {
-          setNews(null);
-          setError(true);
+        if (data.length > 0) {
+          setError({ isError: false, message: '' });
+          setNews(data);
         } else {
-          setNews(data.hits);
-          setError(false);
+          throw new Error('Articles not found!');
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => setError({ isError: true, message: err.message }));
   };
 
   return (
     <Container>
       <Header />
+      {/* <Search /> */}
       <form onSubmit={handleSubmitUser}>
         <input type="text" placeholder="Search" onChange={handleInputUser} />
         <button type="submit">Search</button>
       </form>
       <Main>
         <div>Card</div>
-        {error && <div>Error</div>}
+        {error.isError && (
+          <div className="alert alert-danger">{error.message}</div>
+        )}
         {news &&
-          news.map((article) => (
-            <Card
-              key={article.objectID}
-              title={article.title}
-              author={article.author}
-              points={article.points}
-              url={article.url.value}
-            />
-          ))}
+          news.map((article) => <Card key={article.objectID} {...article} />)}
       </Main>
       <Footer />
     </Container>
