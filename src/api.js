@@ -8,7 +8,7 @@ export const fetchNews = (url) => {
     .then((data) => data.hits)
     .catch(() => {
       throw new Error(
-        'There was a problem loading the articles, please try again later!'
+        'There was a problem loading the articles, please try again later.'
       );
     });
 

@@ -1,0 +1,9 @@
+.news-footer {
+  width: 100%;
+  background-color: var(--dark-color);
+  padding: 2rem 0;
+}
+
+.news-footer a {
+  color: var(--light-color);
+}

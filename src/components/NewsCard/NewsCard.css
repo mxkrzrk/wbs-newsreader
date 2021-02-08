@@ -1,0 +1,20 @@
+.news-card {
+  margin-bottom: 2rem;
+  color: var(--dark-color);
+}
+
+.news-card a {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+.news-card-header {
+  background-color: var(--secondary-color);
+  color: var(--light-color);
+  text-align: right;
+}
+
+.news-card-footer {
+  background-color: var(--orange-color);
+  color: var(--light-color);
+}
