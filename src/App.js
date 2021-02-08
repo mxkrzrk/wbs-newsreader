@@ -6,27 +6,36 @@ import Main from './components/Main/Main';
 import Card from './components/Card/Card';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
+import Pagination from './components/Pagination/Pagination';
+import { CircularProgress } from '@material-ui/core';
 // import Search from './components/Search/search';
 
 function App() {
-  const [news, setNews] = useState();
+  const [news, setNews] = useState([]);
   const [userInput, setUserInput] = useState();
   const [error, setError] = useState({ isError: false });
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [cardsPerPage] = useState(10);
 
   useEffect(() => {
     // Get news from API
+    setLoading(true)
     fetchNews('https://hn.algolia.com/api/v1/search?tags=front_page')
       .then((data) => {
         setError({ isError: false, message: '' });
         setNews(data);
+        setLoading(false)
       })
       .catch((err) => setError({ isError: true, message: err.message }));
     // Refresh news every 5 minutes
     const intervalID = setInterval(() => {
+      setLoading(true)
       fetchNews('https://hn.algolia.com/api/v1/search?tags=front_page')
         .then((data) => {
           setError({ isError: false, message: '' });
           setNews(data);
+          setLoading(false)
         })
         .catch((err) => setError({ isError: true, message: err.message }));
     }, 300000);
@@ -43,17 +52,27 @@ function App() {
     // Check if input is not empty
     if (!userInput) return;
     // Retrieve data
+    setLoading(true)
     fetchNews(`https://hn.algolia.com/api/v1/search?query=${userInput}`)
       .then((data) => {
         if (data.length > 0) {
           setError({ isError: false, message: '' });
           setNews(data);
+          setLoading(false)
         } else {
+          setLoading(false)
           throw new Error('Articles not found!');
         }
+        
       })
       .catch((err) => setError({ isError: true, message: err.message }));
   };
+
+  const indexOfLastCard = currentPage * cardsPerPage;
+  const indexOfFirstCard  = indexOfLastCard  - cardsPerPage;
+  const currentCards = news.slice(indexOfFirstCard , indexOfLastCard);
+
+  const paginate = pageNumber => setCurrentPage(pageNumber);
 
   return (
     <Container>
@@ -64,12 +83,23 @@ function App() {
         <button type="submit">Search</button>
       </form>
       <Main>
-        <div>Card</div>
-        {error.isError && (
+        <br/>
+        {loading && <CircularProgress />}
+        {!loading && error.isError && (
           <div className="alert alert-danger">{error.message}</div>
         )}
-        {news &&
-          news.map((article) => <Card key={article.objectID} {...article} />)}
+        {!loading && !error.isError && news &&
+          currentCards.map((article) => <Card key={article.objectID} {...article} />)}
+
+        <div className='container mt-5'>
+           {/* <Posts posts={currentPosts} loading={loading} /> */}
+            <Pagination
+              cardsPerPage={cardsPerPage}
+              totalCards={news.length}
+              paginate={paginate}
+            />
+        </div>
+
       </Main>
       <Footer />
     </Container>
