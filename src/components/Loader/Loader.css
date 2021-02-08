@@ -1,0 +1,11 @@
+.news-loader {
+  height: 100vh;
+  text-align: center;
+  padding-top: 6rem;
+}
+
+.news-loader-spinner {
+  height: 4rem;
+  width: 4rem;
+  background-color: var(--primary-color);
+}
