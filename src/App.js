@@ -14,7 +14,7 @@ import Loader from './components/Loader/Loader';
 
 function App() {
   const [news, setNews] = useState([]);
-  const [userInput, setUserInput] = useState();
+  const [userInput, setUserInput] = useState({ isValidated: false, value: '' });
   const [error, setError] = useState({ isError: false });
   const [currentPage, setCurrentPage] = useState(1);
   const [cardsPerPage] = useState(10);
@@ -52,16 +52,17 @@ function App() {
   }, []);
 
   const handleInputUser = (e) => {
-    setUserInput(e.target.value);
+    setUserInput({ ...userInput, value: e.target.value });
   };
 
   const handleSubmitUser = (e) => {
     e.preventDefault();
     // Check if input is not empty
-    if (!userInput) return;
+    if (!userInput.value)
+      return setUserInput({ ...userInput, isValidated: true });
     // Retrieve data
     setLoader(true);
-    fetchNews(`https://hn.algolia.com/api/v1/search?query=${userInput}`)
+    fetchNews(`https://hn.algolia.com/api/v1/search?query=${userInput.value}`)
       .then((data) => {
         if (data.length > 0) {
           setError({ isError: false, message: '' });
@@ -98,6 +99,7 @@ function App() {
             handleSubmitUser={handleSubmitUser}
             handleInputUser={handleInputUser}
             userInput={userInput}
+            isValidated={userInput.isValidated}
           />
           <Main>
             {loader && <Loader />}

@@ -1,5 +1,10 @@
 .news-form-box {
-  padding: 2rem 1rem;
+  padding: 2rem 0;
+}
+
+.news-form-box-input {
+  margin-bottom: 0;
+  width: 100%;
 }
 
 .news-form-input {
@@ -16,18 +21,20 @@
 .news-form-button {
   background-color: var(--secondary-color);
   box-shadow: 0 0 5px 1px transparent;
-  border: none;
-  margin: 0 0.5rem;
-  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border: 2px solid var(--secondary-color);
+  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out,
+    border 0.2s ease-in-out;
 }
 
 .news-form-button:hover,
 .news-form-button:focus {
   background-color: var(--orange-color);
   box-shadow: none;
+  border: 2px solid var(--orange-color);
 }
 
 .news-form-button:active {
   background-color: var(--orange-color) !important;
   box-shadow: 0 0 5px 1px var(--orange-color) !important;
+  border: 2px solid var(--orange-color) !important;
 }
