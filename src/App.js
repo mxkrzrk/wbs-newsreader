@@ -12,7 +12,6 @@ import SearchBar from './components/SearchBar/SearchBar';
 import ErrorAlert from './components/ErrorAlert/ErrorAlert';
 import Loader from './components/Loader/Loader';
 
-
 function App() {
   const [news, setNews] = useState([]);
   const [userInput, setUserInput] = useState();
@@ -24,13 +23,11 @@ function App() {
   useEffect(() => {
     setLoader(true);
     // Get news from API
-    setLoading(true)
     fetchNews('https://hn.algolia.com/api/v1/search?tags=front_page')
       .then((data) => {
         setError({ isError: false, message: '' });
         setLoader(false);
         setNews(data);
-        setLoading(false)
       })
       .catch((err) => {
         setLoader(false);
@@ -44,7 +41,6 @@ function App() {
           setError({ isError: false, message: '' });
           setLoader(false);
           setNews(data);
-          setLoading(false)
         })
         .catch((err) => {
           setLoader(false);
@@ -64,7 +60,7 @@ function App() {
     // Check if input is not empty
     if (!userInput) return;
     // Retrieve data
-    setLoading(true)
+    setLoader(true);
     fetchNews(`https://hn.algolia.com/api/v1/search?query=${userInput}`)
       .then((data) => {
         if (data.length > 0) {
@@ -74,21 +70,22 @@ function App() {
         } else {
           throw new Error('Articles not found! Try another keyword.');
         }
-        
       })
-      .catch((err) => setError({ isError: true, message: err.message }));
+      .catch((err) => {
+        setLoader(false);
+        setError({ isError: true, message: err.message });
+      });
   };
-
 
   const handleCloseAlert = () => {
     setError({ isError: false, message: '' });
-    setUserInput('');
+    document.forms[0].reset();
   };
-  
+
   const indexOfLastCard = currentPage * cardsPerPage;
-  const indexOfFirstCard  = indexOfLastCard  - cardsPerPage;
-  const currentCards = news.slice(indexOfFirstCard , indexOfLastCard);
-  const paginate = pageNumber => setCurrentPage(pageNumber);
+  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+  const currentCards = news.slice(indexOfFirstCard, indexOfLastCard);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <Container fluid>
@@ -108,15 +105,15 @@ function App() {
               <ErrorAlert {...error} handleCloseAlert={handleCloseAlert} />
             )}
             {news &&
-              news.map((article) => (
+              currentCards.map((article) => (
                 <NewsCard key={article.objectID} {...article} />
               ))}
           </Main>
-           <Pagination
-              cardsPerPage={cardsPerPage}
-              totalCards={news.length}
-              paginate={paginate}
-            />
+          <Pagination
+            cardsPerPage={cardsPerPage}
+            totalCards={news.length}
+            paginate={paginate}
+          />
         </Col>
       </Row>
       <Row>

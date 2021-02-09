@@ -19,7 +19,6 @@ const SearchBar = ({ handleSubmitUser, handleInputUser, userInput}) => {
           size="lg"
           className="news-form-input"
           autoFocus
-          value={userInput}
         />
         <Button type="submit" className="news-form-button" size="lg">
           <FontAwesomeIcon icon={faSearch} />
