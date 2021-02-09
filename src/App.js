@@ -21,8 +21,19 @@ function App() {
   const [loader, setLoader] = useState(false);
 
   useEffect(() => {
-    setLoader(true);
     // Get news from API
+    fetchNewsHomePage();
+    // Refresh news every 5 minutes
+    const intervalID = setInterval(() => {
+      fetchNewsHomePage();
+    }, 300000);
+    // Clear interval
+    return () => clearInterval(intervalID);
+  }, []);
+
+  const fetchNewsHomePage = () => {
+    // Get news from API
+    setLoader(true);
     fetchNews('https://hn.algolia.com/api/v1/search?tags=front_page')
       .then((data) => {
         setError({ isError: false, message: '' });
@@ -33,23 +44,7 @@ function App() {
         setLoader(false);
         setError({ isError: true, message: err.message });
       });
-    // Refresh news every 5 minutes
-    const intervalID = setInterval(() => {
-      setLoader(true);
-      fetchNews('https://hn.algolia.com/api/v1/search?tags=front_page')
-        .then((data) => {
-          setError({ isError: false, message: '' });
-          setLoader(false);
-          setNews(data);
-        })
-        .catch((err) => {
-          setLoader(false);
-          setError({ isError: true, message: err.message });
-        });
-    }, 300000);
-    // Clear interval
-    return () => clearInterval(intervalID);
-  }, []);
+  };
 
   const handleInputUser = (e) => {
     setUserInput({ ...userInput, value: e.target.value });
@@ -62,7 +57,9 @@ function App() {
       return setUserInput({ ...userInput, isValidated: true });
     // Retrieve data
     setLoader(true);
-    fetchNews(`https://hn.algolia.com/api/v1/search?query=${userInput.value}`)
+    fetchNews(
+      `https://hn.algolia.com/api/v1/search?query=${userInput.value}&page=1&hitsPerPage=50`
+    )
       .then((data) => {
         if (data.length > 0) {
           setError({ isError: false, message: '' });
@@ -80,18 +77,33 @@ function App() {
 
   const handleCloseAlert = () => {
     setError({ isError: false, message: '' });
+    setUserInput({ isValidated: false, value: '' });
+    document.forms[0].reset();
+  };
+
+  const handleClickHome = () => {
+    // Get news from API
+    fetchNewsHomePage();
+    setUserInput({ isValidated: false, value: '' });
     document.forms[0].reset();
   };
 
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
   const currentCards = news.slice(indexOfFirstCard, indexOfLastCard);
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth',
+    });
+  };
 
   return (
     <Container fluid>
       <Row>
-        <Header />
+        <Header handleClickHome={handleClickHome} />
       </Row>
       <Row>
         <Col xs={12} lg={{ span: 6, offset: 3 }}>
