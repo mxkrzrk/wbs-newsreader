@@ -1,43 +1,55 @@
 import React, { useEffect, useState } from 'react';
 import { fetchNews } from './api';
-import './App.css';
-import Container from './components/Container/Container';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 import Main from './components/Main/Main';
-import Card from './components/Card/Card';
+import NewsCard from './components/NewsCard/NewsCard';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import Pagination from './components/Pagination/Pagination';
-import { CircularProgress } from '@material-ui/core';
-// import Search from './components/Search/search';
+import SearchBar from './components/SearchBar/SearchBar';
+import ErrorAlert from './components/ErrorAlert/ErrorAlert';
+import Loader from './components/Loader/Loader';
+
 
 function App() {
   const [news, setNews] = useState([]);
   const [userInput, setUserInput] = useState();
   const [error, setError] = useState({ isError: false });
-  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [cardsPerPage] = useState(10);
+  const [loader, setLoader] = useState(false);
 
   useEffect(() => {
+    setLoader(true);
     // Get news from API
     setLoading(true)
     fetchNews('https://hn.algolia.com/api/v1/search?tags=front_page')
       .then((data) => {
         setError({ isError: false, message: '' });
+        setLoader(false);
         setNews(data);
         setLoading(false)
       })
-      .catch((err) => setError({ isError: true, message: err.message }));
+      .catch((err) => {
+        setLoader(false);
+        setError({ isError: true, message: err.message });
+      });
     // Refresh news every 5 minutes
     const intervalID = setInterval(() => {
-      setLoading(true)
+      setLoader(true);
       fetchNews('https://hn.algolia.com/api/v1/search?tags=front_page')
         .then((data) => {
           setError({ isError: false, message: '' });
+          setLoader(false);
           setNews(data);
           setLoading(false)
         })
-        .catch((err) => setError({ isError: true, message: err.message }));
+        .catch((err) => {
+          setLoader(false);
+          setError({ isError: true, message: err.message });
+        });
     }, 300000);
     // Clear interval
     return () => clearInterval(intervalID);
@@ -57,51 +69,59 @@ function App() {
       .then((data) => {
         if (data.length > 0) {
           setError({ isError: false, message: '' });
+          setLoader(false);
           setNews(data);
-          setLoading(false)
         } else {
-          setLoading(false)
-          throw new Error('Articles not found!');
+          throw new Error('Articles not found! Try another keyword.');
         }
         
       })
       .catch((err) => setError({ isError: true, message: err.message }));
   };
 
+
+  const handleCloseAlert = () => {
+    setError({ isError: false, message: '' });
+    setUserInput('');
+  };
+  
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard  = indexOfLastCard  - cardsPerPage;
   const currentCards = news.slice(indexOfFirstCard , indexOfLastCard);
-
   const paginate = pageNumber => setCurrentPage(pageNumber);
 
   return (
-    <Container>
-      <Header />
-      {/* <Search /> */}
-      <form onSubmit={handleSubmitUser}>
-        <input type="text" placeholder="Search" onChange={handleInputUser} />
-        <button type="submit">Search</button>
-      </form>
-      <Main>
-        <br/>
-        {loading && <CircularProgress />}
-        {!loading && error.isError && (
-          <div className="alert alert-danger">{error.message}</div>
-        )}
-        {!loading && !error.isError && news &&
-          currentCards.map((article) => <Card key={article.objectID} {...article} />)}
-
-        <div className='container mt-5'>
-           {/* <Posts posts={currentPosts} loading={loading} /> */}
-            <Pagination
+    <Container fluid>
+      <Row>
+        <Header />
+      </Row>
+      <Row>
+        <Col xs={12} lg={{ span: 6, offset: 3 }}>
+          <SearchBar
+            handleSubmitUser={handleSubmitUser}
+            handleInputUser={handleInputUser}
+            userInput={userInput}
+          />
+          <Main>
+            {loader && <Loader />}
+            {error.isError && (
+              <ErrorAlert {...error} handleCloseAlert={handleCloseAlert} />
+            )}
+            {news &&
+              news.map((article) => (
+                <NewsCard key={article.objectID} {...article} />
+              ))}
+          </Main>
+           <Pagination
               cardsPerPage={cardsPerPage}
               totalCards={news.length}
               paginate={paginate}
             />
-        </div>
-
-      </Main>
-      <Footer />
+        </Col>
+      </Row>
+      <Row>
+        <Footer />
+      </Row>
     </Container>
   );
 }

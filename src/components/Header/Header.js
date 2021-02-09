@@ -1,23 +1,20 @@
-import React from "react";
+import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faNewspaper } from '@fortawesome/free-solid-svg-icons';
+import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav';
+import './Header.css';
 
-const Header= () => {
-    return(
-    //<header>
-        <nav className="navbar navbar-expand-lg navbar-light" style={{backgroundColor: "#Bfcca1"}}>
-            <a className="navbar-brand" href="#">NewsReader</a>
-            <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span className="navbar-toggler-icon"></span>
-            </button>
-            <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-                <div className="navbar-nav">
-                    <a className="nav-item nav-link active" href="#">Home <span className="sr-only">(current)</span></a>
-                    <a className="nav-item nav-link" href="#">New</a>
-                    <a className="nav-item nav-link" href="#">Past</a> 
-                </div>
-            </div>    
-        </nav>
-    //</header>
-
-    )
-} 
+const Header = () => {
+  return (
+    <Navbar className="news-navbar d-flex justify-content-center align-items-center">
+      <Nav className="d-flex justify-content-center align-items-center">
+        <div className="news-nav-icon-box">
+          <FontAwesomeIcon icon={faNewspaper} size="2x" className="news-nav-icon" />
+        </div>
+        <h1>NewsReader</h1>
+      </Nav>
+    </Navbar>
+  );
+};
 export default Header;
